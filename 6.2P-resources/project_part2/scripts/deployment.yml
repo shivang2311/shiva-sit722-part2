@@ -1,1 +1,36 @@
 # Write Kubernetes Deployment Script
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: book-cata-deployment  # Changed to comply with DNS-1035 naming conventions
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: book-cata  # Label must match the template label
+  template:
+    metadata:
+      labels:
+        app: book-cata
+    spec:
+      containers: 
+      - name: book-cata
+        image: book_cat:1
+        imagePullPolicy: Never
+        env:
+        - name: DATABASE_URL
+          value: "postgresql://week8_book_cata_user:7gr8wPes4N8JxPunVSPn7WZuGzdeeNCl@dpg-crg69d3qf0us73di5lcg-a.oregon-postgres.render.com/week8_book_cata"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: book-cata-service  # Changed to comply with DNS-1035 naming conventions
+spec:
+  selector:
+    app: book-cata  # Label must match the app label in the Deployment
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+      nodePort: 30000
